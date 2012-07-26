@@ -1,0 +1,10 @@
+buildscript {
+/*    dependencies {
+    some jar in an lib directory will enable a plugin. 
+    }*/
+}
+
+//**TODO
+// apply the plugin to the root project (which might apply it to all projects)
+// maybe apply plugin: "myjava"
+// that adds repositories, publication of snapshots, and findbugs
