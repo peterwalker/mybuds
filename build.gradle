@@ -1,0 +1,16 @@
+
+def unpackedGradleDir = "$buildDir/gradledist"
+
+//Unpack Gradle from a distribution before configuring dependencies
+task unPackGradle {
+	def downloadGradleDir = "$buildDir/gradledownload"
+	new File(downloadGradleDir).mkdirs()
+	new File(unpackedGradleDir).mkdirs()
+	def address = 'http://services.gradle.org/distributions/gradle-1.1-rc-2-bin.zip'
+	def fileName = "$downloadGradleDir/${address.tokenize("/")[-1]}"
+	def fos = new FileOutputStream(fileName)
+	def bos = new BufferedOutputStream(fos)
+	bos << new URL(address).openStream()
+	bos.close()
+	ant.unzip(src: fileName, dest:unpackedGradleDir)
+}
