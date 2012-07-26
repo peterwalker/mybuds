@@ -1,16 +1,36 @@
+apply plugin: 'groovy'
 
+group = 'com.gradleware.pbw'
+version = '0.1'
 def unpackedGradleDir = "$buildDir/gradledist"
-
-//Unpack Gradle from a distribution before configuring dependencies
+def gradleVersion = "gradle-1.1-rc-2"
 task unPackGradle {
-	def downloadGradleDir = "$buildDir/gradledownload"
-	new File(downloadGradleDir).mkdirs()
-	new File(unpackedGradleDir).mkdirs()
-	def address = 'http://services.gradle.org/distributions/gradle-1.1-rc-2-bin.zip'
-	def fileName = "$downloadGradleDir/${address.tokenize("/")[-1]}"
-	def fos = new FileOutputStream(fileName)
-	def bos = new BufferedOutputStream(fos)
-	bos << new URL(address).openStream()
-	bos.close()
-	ant.unzip(src: fileName, dest:unpackedGradleDir)
+	doFirst{
+		def downloadGradleDir = "$buildDir/gradledownload"
+		if (!new File(downloadGradleDir).isDirectory()) {
+			new File(downloadGradleDir).mkdirs()
+			def address = "http://services.gradle.org/distributions/${gradleVersion}-bin.zip"
+			def fileName = "$downloadGradleDir/${address.tokenize("/")[-1]}"
+			def fos = new FileOutputStream(fileName)
+			def bos = new BufferedOutputStream(fos)
+			bos << new URL(address).openStream()
+			bos.close()
+			
+			new File(unpackedGradleDir).mkdirs()
+			ant.unzip(src: fileName, dest:unpackedGradleDir)
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	groovy files("$unpackedGradleDir/${gradleVersion}/lib/groovy-all-1.8.6.jar") {
+		builtBy 'unPackGradle'
+	}
+	compile fileTree(dir: "$unpackedGradleDir/${gradleVersion}/lib", include:'gradle*.jar') 
+    testCompile 'org.spockframework:spock-core:0.6-groovy-1.8'
+    testCompile 'junit:junit:4.10'
 }
